@@ -1,8 +1,7 @@
-import os
 from collections import defaultdict
 from pathlib import Path
 from posixpath import join as pjoin
-from typing import List
+from typing import List, Dict, Tuple, Optional, Iterable
 
 import attr
 
@@ -11,44 +10,49 @@ import attr
 class Package:
     path = attr.ib(type=Path)
 
+    @property
+    def name(self):
+        return self.path.name
+
+    def _convert(self, path: Path, root: Optional[Path] = None, sep: str = '.') -> str:
+        if root is None:
+            root = self.path
+        parts = path.parts[len(root.parts):]
+        if sep == '.':
+            parts = (root.name, ) + parts
+        return sep.join(parts)
+
+    def _find_nearest_pkg(self, path: Path, subpkg_paths: Iterable[Path]) -> Tuple[str, str]:
+        for parent in path.parents:
+            if parent in subpkg_paths:
+                pkg = self._convert(parent)
+                rel_path = self._convert(path, root=parent, sep='/')
+                return pkg, rel_path
+
+        # Relative to the top-level package
+        return self.name, '/'.join(path.parts[len(self.path.parts):])
+
     # https://github.com/takluyver/flit/blob/master/flit/sdist.py
-    def _discover(self):
+    def _discover(self) -> Tuple[List[str], Dict[str, List[str]]]:
         """Discover subpackages and package_data"""
-        pkgdir = os.path.normpath(str(self.path))
-        pkg_name = os.path.basename(pkgdir)
-        pkg_data = defaultdict(list)
+        pkg_data = defaultdict(set)
         # Undocumented distutils feature: the empty string matches all package names
-        pkg_data[''].append('*')
-        packages = [pkg_name]
+        pkg_data[''].add('*')
+        packages = [self.name]
         subpkg_paths = set()
 
-        def find_nearest_pkg(rel_path):
-            parts = rel_path.split(os.sep)
-            for i in reversed(range(1, len(parts))):
-                ancestor = '/'.join(parts[:i])
-                if ancestor in subpkg_paths:
-                    pkg = '.'.join([pkg_name] + parts[:i])
-                    return pkg, '/'.join(parts[i:])
-
-            # Relative to the top-level package
-            return pkg_name, rel_path
-
-        for path, dirnames, filenames in os.walk(pkgdir, topdown=True):
-            if os.path.basename(path) == '__pycache__':
+        for path in self.path.glob('**/*'):
+            if '__pycache__' in path.parts:
+                continue
+            if path.parent.samefile(self.path):
                 continue
 
-            from_top_level = os.path.relpath(path, pkgdir)
-            if from_top_level == '.':
-                continue
-
-            is_subpkg = '__init__.py' in filenames
-            if is_subpkg:
-                subpkg_paths.add(from_top_level)
-                parts = from_top_level.split(os.sep)
-                packages.append('.'.join([pkg_name] + parts))
-            elif filenames:  # don't include empty dirs
-                pkg, from_nearest_pkg = find_nearest_pkg(from_top_level)
-                pkg_data[pkg].append(pjoin(from_nearest_pkg, '*'))
+            if path.name == '__init__.py':
+                subpkg_paths.add(path.parent)
+                packages.append(self._convert(path.parent))
+            elif path.is_file():
+                pkg, from_nearest_pkg = self._find_nearest_pkg(path=path.parent, subpkg_paths=subpkg_paths)
+                pkg_data[pkg].add(pjoin(from_nearest_pkg, '*'))
 
         # Sort values in pkg_data
         pkg_data = {k: sorted(v) for k, v in pkg_data.items()}
@@ -63,7 +67,7 @@ class Package:
         return self.__dict__['packages']
 
     @property
-    def data(self):
+    def data(self) -> Dict[str, List[str]]:
         if 'data' in self.__dict__:
             return self.__dict__['data']
         self.__dict__['packages'], self.__dict__['data'] = self._discover()
