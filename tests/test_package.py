@@ -2,8 +2,8 @@ from dephell_discover import Root
 
 
 def test_discover_packages(tmp_path):
+    p = Root(path=tmp_path)
     path = tmp_path / 'project1'
-    p = Root(path=path)
 
     path.mkdir()
     (path / 'dir1').mkdir()
@@ -15,7 +15,7 @@ def test_discover_packages(tmp_path):
 
     (path / '__init__.py').touch()
     (path / 'file1.py').touch()
-    (path / 'file2.json').touch()
+    (path / 'file2.db').touch()
     (path / 'dir1' / '__init__.py').touch()
     (path / 'dir2' / 'file3.json').touch()
 
@@ -26,5 +26,5 @@ def test_discover_packages(tmp_path):
 
     assert set(p.packages) == {'project1', 'project1.dir1', 'project1.dir3'}
     assert set(p.data) == {'', 'project1', 'project1.dir3'}
-    assert set(p.data['project1']) == {'dir2/*'}
-    assert set(p.data['project1.dir3']) == {'dir4/*'}
+    assert set(p.data['project1']) == {'*.db', 'dir2/*.json'}
+    assert set(p.data['project1.dir3']) == {'dir4/*.json'}
