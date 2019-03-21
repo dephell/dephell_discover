@@ -1,15 +1,13 @@
-from collections import defaultdict
 from itertools import chain
 from pathlib import Path
-from posixpath import join as pjoin
-from typing import List, Dict, Tuple
+from typing import List, Set
 
 import attr
 
-from ._relative import get_relative_path
 from ._constants import BAD_DIRS_ANY, BAD_DIRS_ROOT
 from ._cached_propery import cached_property
 from ._package import Package
+from ._data import Data
 
 
 @attr.s()
@@ -20,13 +18,12 @@ class Root:
     def name(self):
         return self.path.name
 
-    def _find_nearest_pkg(self, path: Path) -> Tuple[str, str]:
+    def _make_data(self, path: Path, ext: str) -> Data:
         paths = {package.path for package in self.packages}
         for parent in chain((path,), path.parents):
-            if parent in paths:
-                pkg = get_relative_path(parent, root=self.path)
-                rel_path = get_relative_path(path, root=parent, sep='/')
-                return pkg, rel_path
+            if parent not in paths:
+                continue
+            return Data(path=path, ext=ext, package=Package(path=parent, root=self.path))
         raise LookupError('cannot find package for data: ' + str(path))
 
     def include(self, path: Path) -> bool:
@@ -51,22 +48,13 @@ class Root:
         return packages
 
     @cached_property
-    def data(self) -> Dict[str, List[str]]:
-        pkg_data = defaultdict(set)
-        # Undocumented distutils feature: the empty string matches all package names
-        pkg_data[''].add('*')
-
+    def data(self) -> Set[Data]:
+        data = set()
         for path in self.path.glob('**/*'):
             if not self.include(path=path):
                 continue
             # skip dirs and python files
             if not path.is_file() or path.suffix == '.py':
                 continue
-            print(path)
-            pkg, from_nearest_pkg = self._find_nearest_pkg(path=path.parent)
-            pkg_data[pkg].add(pjoin(from_nearest_pkg, '*' + path.suffix))
-
-        # Sort values in pkg_data
-        pkg_data = {k: sorted(v) for k, v in pkg_data.items()}
-
-        return pkg_data
+            data.add(self._make_data(path=path.parent, ext=path.suffix))
+        return data
