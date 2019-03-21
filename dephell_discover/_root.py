@@ -1,10 +1,10 @@
 from itertools import chain
 from pathlib import Path
-from typing import List, Set
+from typing import List, Set, Optional
 
 import attr
 
-from ._constants import BAD_DIRS_ANY, BAD_DIRS_ROOT
+from ._constants import BAD_DIRS_ANY, BAD_DIRS_ROOT, BAD_EXTS
 from ._cached_propery import cached_property
 from ._package import Package
 from ._data import Data
@@ -18,13 +18,14 @@ class Root:
     def name(self):
         return self.path.name
 
-    def _make_data(self, path: Path, ext: str) -> Data:
+    def _make_data(self, path: Path, ext: str) -> Optional[Data]:
         paths = {package.path for package in self.packages}
         for parent in chain((path,), path.parents):
             if parent not in paths:
                 continue
             return Data(path=path, ext=ext, package=Package(path=parent, root=self.path))
-        raise LookupError('cannot find package for data: ' + str(path))
+        # data not in any package
+        return None
 
     def include(self, path: Path) -> bool:
         parts = path.parts[len(self.path.parts):]
@@ -36,6 +37,9 @@ class Root:
             return False
         # bad dirs inside the project
         if set(parts) & BAD_DIRS_ANY:
+            return False
+        # bad extension
+        if path.suffix.replace('.', '') in BAD_EXTS:
             return False
         return True
 
@@ -49,12 +53,14 @@ class Root:
 
     @cached_property
     def data(self) -> Set[Data]:
-        data = set()
+        result = set()
         for path in self.path.glob('**/*'):
             if not self.include(path=path):
                 continue
             # skip dirs and python files
             if not path.is_file() or path.suffix == '.py':
                 continue
-            data.add(self._make_data(path=path.parent, ext=path.suffix))
-        return data
+            data = self._make_data(path=path.parent, ext=path.suffix)
+            if data is not None:
+                result.add(data)
+        return result

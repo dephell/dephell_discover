@@ -5,12 +5,25 @@ BAD_DIRS_ANY = {
     'pip-wheel-metadata',
 }
 
+# any hidden dirs (.*) will be excluded automatically
 BAD_DIRS_ROOT = {
-    'cache',
-    'output',
     'build',
+    'cache',
     'dist',
-    'htmlcov',
     'env',
+    'htmlcov',
+    'output',
+    'tests',
     'venv',
+}
+
+BAD_EXTS = {
+    'egg',
+    'log',
+    'manifest',
+    'pyc',
+    'pyd',
+    'pyo',
+    'so',
+    'spec',
 }

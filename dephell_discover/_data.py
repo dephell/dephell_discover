@@ -26,7 +26,7 @@ class Data:
         return '*' + self.ext
 
     def __iter__(self) -> Iterator[Path]:
-        yield from self.path.glob('*.py')
+        yield from self.path.glob('*' + self.ext)
 
     def __str__(self) -> str:
         return self.relative

@@ -15,6 +15,7 @@ def test_discover_packages(tmp_path):
     (path / 'empty').mkdir()
     (path / '__pycache__').mkdir()
 
+    (tmp_path / 'ignore.json').touch()
     (path / '__init__.py').touch()
     (path / 'file1.py').touch()
     (path / 'file2.db').touch()
