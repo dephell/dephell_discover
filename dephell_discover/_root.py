@@ -1,32 +1,26 @@
 from collections import defaultdict
 from pathlib import Path
 from posixpath import join as pjoin
-from typing import List, Dict, Tuple, Optional, Iterable
+from typing import List, Dict, Tuple, Iterable
 
 import attr
 
+from ._relative import get_relative_path
+
 
 @attr.s()
-class Package:
+class Root:
     path = attr.ib(type=Path)
 
     @property
     def name(self):
         return self.path.name
 
-    def _convert(self, path: Path, root: Optional[Path] = None, sep: str = '.') -> str:
-        if root is None:
-            root = self.path
-        parts = path.parts[len(root.parts):]
-        if sep == '.':
-            parts = (root.name, ) + parts
-        return sep.join(parts)
-
     def _find_nearest_pkg(self, path: Path, subpkg_paths: Iterable[Path]) -> Tuple[str, str]:
         for parent in path.parents:
             if parent in subpkg_paths:
-                pkg = self._convert(parent)
-                rel_path = self._convert(path, root=parent, sep='/')
+                pkg = get_relative_path(parent, root=self.path.parent)
+                rel_path = get_relative_path(path, root=parent, sep='/')
                 return pkg, rel_path
 
         # Relative to the top-level package
@@ -49,7 +43,7 @@ class Package:
 
             if path.name == '__init__.py':
                 subpkg_paths.add(path.parent)
-                packages.append(self._convert(path.parent))
+                packages.append(get_relative_path(path.parent, root=self.path.parent))
             elif path.is_file():
                 pkg, from_nearest_pkg = self._find_nearest_pkg(path=path.parent, subpkg_paths=subpkg_paths)
                 pkg_data[pkg].add(pjoin(from_nearest_pkg, '*'))

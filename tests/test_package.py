@@ -1,9 +1,9 @@
-from dephell_package import Package
+from dephell_discover import Root
 
 
 def test_discover_packages(tmp_path):
     path = tmp_path / 'project1'
-    p = Package(path=path)
+    p = Root(path=path)
 
     path.mkdir()
     (path / 'dir1').mkdir()
