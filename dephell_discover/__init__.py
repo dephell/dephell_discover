@@ -1,4 +1,4 @@
-from .package import Package
+from ._root import Root
 
 
-__all__ = ['Package']
+__all__ = ['Root']
