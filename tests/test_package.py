@@ -24,7 +24,7 @@ def test_discover_packages(tmp_path):
 
     (path / '__pycache__' / 'lol.pyc').touch()
 
-    assert set(p.packages) == {'project1', 'project1.dir1', 'project1.dir3'}
+    assert set(map(str, p.packages)) == {'project1', 'project1.dir1', 'project1.dir3'}
     assert set(p.data) == {'', 'project1', 'project1.dir3'}
     assert set(p.data['project1']) == {'*.db', 'dir2/*.json'}
     assert set(p.data['project1.dir3']) == {'dir4/*.json'}
