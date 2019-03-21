@@ -1,0 +1,14 @@
+[tool.dephell.main]
+from = {format = "poetry", path = "pyproject.toml"}
+to = {format = "setuppy", path = "setup.py"}
+
+[tool.poetry]
+name = "dephell_discover"
+version = "0.1.0"
+authors = ["orsinium"]
+description = "Find project modules and data files (packages and package_data for setup.py)."
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.5"
+packaging = "*"
