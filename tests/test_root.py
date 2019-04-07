@@ -87,7 +87,7 @@ def test_get_module_name(files, expected, tmp_path):
         {'foobar', 'foobar.sub'},
     ],
 ])
-def test_packages(files, expected_modules, tmp_path):
+def test_packages_module(files, expected_modules, tmp_path):
     for file_path in files:
         path = tmp_path.joinpath(file_path)
         if '/' in file_path:
@@ -97,3 +97,25 @@ def test_packages(files, expected_modules, tmp_path):
     root = Root(path=tmp_path, name='foobar')
     assert len(root.packages) == len(expected_modules)
     assert {package.module for package in root.packages} == expected_modules
+
+
+@pytest.mark.parametrize('files, expected_paths', [
+    [('foobar/__init__.py', 'foobar/foo.py', 'foobar/bar.py'), {'foobar'}],
+    [('src/__init__.py', 'src/foo.py', 'src/bar.py'), {'src'}],
+    # [('src/foo.py', 'src/bar.py'), {'src/'}],
+    [('__init__.py', 'foo.py', 'bar.py'), {''}],
+    [('src/foobar/__init__.py', 'src/foobar/foo.py', 'src/foobar/bar.py'), {'src/foobar'}],
+    [
+        ('src/foobar/__init__.py', 'src/foobar/foo.py', 'src/foobar/sub/bar.py', 'src/foobar/sub/__init__.py'),
+        {'src/foobar', 'src/foobar/sub'},
+    ],
+])
+def test_packages_path(files, expected_paths, tmp_path):
+    for file_path in files:
+        path = tmp_path.joinpath(file_path)
+        if '/' in file_path:
+            path.parent.mkdir(parents=True, exist_ok=True)
+        path.touch()
+
+    root = Root(path=tmp_path, name='foobar')
+    assert {package.relative for package in root.packages} == expected_paths
