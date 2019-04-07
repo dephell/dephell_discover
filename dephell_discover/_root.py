@@ -46,7 +46,11 @@ class Root:
         packages = []
         for path in self.path.glob('**/__init__.py'):
             if self.include(path=path):
-                packages.append(Package(path=path.parent, root=self.path))
+                packages.append(Package(
+                    path=path.parent,
+                    root=self.path,
+                    module=self._get_module_name(path.parent),
+                ))
         return packages
 
     @cached_property
@@ -88,7 +92,8 @@ class Root:
         for parent in chain((path,), path.parents):
             if parent not in paths:
                 continue
-            return Data(path=path, ext=ext, package=Package(path=parent, root=self.path))
+            package = Package(path=parent, root=self.path, module=self._get_module_name(parent))
+            return Data(path=path, ext=ext, package=package)
         # data not in any package
         return None
 
