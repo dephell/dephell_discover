@@ -11,8 +11,11 @@ class Package:
     module = attr.ib(type=str)
 
     @property
-    def relative_path(self) -> Path:
-        return self.path.relative_to(self.root)
+    def relative(self) -> str:
+        path = self.path.relative_to(self.root).as_posix()
+        if path == '.':
+            return ''
+        return path
 
     def __iter__(self) -> Iterator[Path]:
         yield from self.path.glob('*.py')
