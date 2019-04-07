@@ -3,7 +3,6 @@ from typing import Iterator
 
 import attr
 
-from ._cached_propery import cached_property
 from ._package import Package
 
 

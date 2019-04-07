@@ -1,5 +1,6 @@
 .hypothesis/
 .pytest_cache/
+.tox/
 __pycache__/
 *.py[cod]
 
