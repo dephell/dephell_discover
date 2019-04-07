@@ -42,6 +42,7 @@ def test_discover_packages(tmp_path):
 @pytest.mark.parametrize('name, files, expected', [
     ['foobar', ('foobar/__init__.py', 'foobar/foo.py', 'foobar/bar.py'), {'': ''}],
     ['foobar', ('src/__init__.py', 'src/foo.py', 'src/bar.py'), {'foobar': 'src'}],
+    ['foobar', ('src/foo.py', 'src/bar.py'), {'': 'src'}],
     ['foobar', ('__init__.py', 'foo.py', 'bar.py'), {'foobar': ''}],
     ['foobar', ('src/foobar/__init__.py', 'src/foobar/foo.py', 'src/foobar/bar.py'), {'': 'src'}],
 ])
@@ -54,3 +55,22 @@ def test_package_dir(name, files, expected, tmp_path):
 
     root = Root(path=tmp_path, name=name)
     assert root.package_dir == expected
+
+
+@pytest.mark.parametrize('name, files, expected', [
+    ['foobar', ('foobar/__init__.py', 'foobar/foo.py', 'foobar/bar.py'), {'foobar/': 'foobar'}],
+    ['foobar', ('src/__init__.py', 'src/foo.py', 'src/bar.py'), {'src/': 'foobar'}],
+    ['foobar', ('src/foo.py', 'src/bar.py'), {'src/': ''}],
+    ['foobar', ('__init__.py', 'foo.py', 'bar.py'), {'': 'foobar'}],
+    ['foobar', ('src/foobar/__init__.py', 'src/foobar/foo.py', 'src/foobar/bar.py'), {'src/foobar/': 'foobar'}],
+])
+def test_get_module_name(name, files, expected, tmp_path):
+    for file_path in files:
+        path = tmp_path.joinpath(file_path)
+        if '/' in file_path:
+            path.parent.mkdir(parents=True, exist_ok=True)
+        path.touch()
+
+    root = Root(path=tmp_path, name=name)
+    for file_path, module_name in expected.items():
+        assert root._get_module_name(path=tmp_path.joinpath(file_path)) == module_name

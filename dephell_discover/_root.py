@@ -91,3 +91,14 @@ class Root:
             return Data(path=path, ext=ext, package=Package(path=parent, root=self.path))
         # data not in any package
         return None
+
+    def _get_module_name(self, path: Path) -> str:
+        parts = list(path.parts[len(self.path.parts):])
+        root_name, root_dir = next(iter(self.package_dir.items()))
+        if root_dir == '':
+            parts.insert(0, root_name)
+        elif parts and parts[0] == root_dir:
+            parts = [root_name] + parts[1:]
+
+        module = '.'.join(part for part in parts if part)
+        return module
