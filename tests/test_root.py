@@ -1,5 +1,7 @@
 from collections import defaultdict
 
+import pytest
+
 from dephell_discover import Root
 
 
@@ -35,3 +37,20 @@ def test_discover_packages(tmp_path):
     assert set(data) == {'project1', 'project1.dir3'}
     assert data['project1'] == {'*.db', 'dir2/*.json'}
     assert data['project1.dir3'] == {'dir4/*.json'}
+
+
+@pytest.mark.parametrize('name, files, expected', [
+    ['foobar', ('foobar/__init__.py', 'foobar/foo.py', 'foobar/bar.py'), {'': ''}],
+    ['foobar', ('src/__init__.py', 'src/foo.py', 'src/bar.py'), {'foobar': 'src'}],
+    ['foobar', ('__init__.py', 'foo.py', 'bar.py'), {'foobar': ''}],
+    ['foobar', ('src/foobar/__init__.py', 'src/foobar/foo.py', 'src/foobar/bar.py'), {'': 'src'}],
+])
+def test_package_dir(name, files, expected, tmp_path):
+    for file_path in files:
+        path = tmp_path.joinpath(file_path)
+        if '/' in file_path:
+            path.parent.mkdir(parents=True, exist_ok=True)
+        path.touch()
+
+    root = Root(path=tmp_path, name=name)
+    assert root.package_dir == expected
