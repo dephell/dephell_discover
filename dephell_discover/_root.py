@@ -44,7 +44,12 @@ class Root:
     @cached_property
     def packages(self) -> List[Package]:
         packages = []
-        for path in self.path.glob('**/__init__.py'):
+
+        root = self.path / self.name.replace('-', '_')
+        if not root.exists():
+            root = self.path
+
+        for path in root.glob('**/__init__.py'):
             if self.include(path=path):
                 packages.append(Package(
                     path=path.parent,
