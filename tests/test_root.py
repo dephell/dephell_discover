@@ -6,7 +6,7 @@ from dephell_discover import Root
 
 
 def test_discover_packages(tmp_path):
-    p = Root(path=tmp_path)
+    package = Root(path=tmp_path)
     path = tmp_path / 'project1'
 
     path.mkdir()
@@ -29,11 +29,11 @@ def test_discover_packages(tmp_path):
 
     (path / '__pycache__' / 'lol.pyc').touch()
 
-    assert set(map(str, p.packages)) == {'project1', 'project1.dir1', 'project1.dir3'}
+    assert set(map(str, package.packages)) == {'project1', 'project1.dir1', 'project1.dir3'}
 
     data = defaultdict(set)
-    for f in p.data:
-        data[f.module].add(str(f))
+    for subpackage in package.data:
+        data[subpackage.module].add(str(subpackage))
     assert set(data) == {'project1', 'project1.dir3'}
     assert data['project1'] == {'*.db', 'dir2/*.json'}
     assert data['project1.dir3'] == {'dir4/*.json'}
