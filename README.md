@@ -1,5 +1,9 @@
 # Dephell Discover
 
+[![travis](https://travis-ci.org/dephell/dephell_discover.svg?branch=master)](https://travis-ci.org/dephell/dephell_discover)
+[![appveyor](https://ci.appveyor.com/api/projects/status/github/dephell/dephell_discover?svg=true)](https://ci.appveyor.com/project/orsinium/dephell-discover)
+[![MIT License](https://img.shields.io/pypi/l/dephell-discover.svg)](https://github.com/dephell/dephell_discover/blob/master/LICENSE)
+
 Find project modules and data files (`packages` and `package_data` for `setup.py`).
 
 ## Installation
