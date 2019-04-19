@@ -14,7 +14,7 @@ command = "pytest tests/"
 
 [tool.dephell.typing]
 from = {format = "poetry", path = "pyproject.toml"}
-command = "mypy --ignore-missing-imports --allow-redefinition dephell_venvs"
+command = "mypy --ignore-missing-imports --allow-redefinition dephell_discover"
 
 
 [tool.poetry]
