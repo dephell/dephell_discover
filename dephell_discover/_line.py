@@ -4,6 +4,8 @@ from typing import Optional
 
 import attr
 
+from ._constants import DOCSTRING
+
 
 @attr.s(freeze=True)
 class Line:
@@ -32,7 +34,10 @@ class Line:
     def parse(cls, content: str, row: int, path: Path) -> Optional['Line']:
         if '=' not in content:
             return None
-        tree = ast.parse(content)
+        try:
+            tree = ast.parse(content)
+        except SyntaxError:
+            return None
         # check is assigment
         if type(tree.body[0]) is not ast.Assign:
             return None
@@ -69,3 +74,20 @@ class Line:
             )
 
         return None
+
+    @classmethod
+    def parse_docstring(cls, content: str, path: Path) -> Optional['Line']:
+        try:
+            tree = ast.parse(content)
+        except SyntaxError:
+            return None
+        docstring = ast.get_docstring(tree)
+        if docstring is None:
+            return None
+        return cls(
+            target=DOCSTRING,
+            value=docstring,
+            content='',
+            row=0,
+            path=path,
+        )

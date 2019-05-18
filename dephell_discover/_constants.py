@@ -27,3 +27,5 @@ BAD_EXTS = {
     'so',
     'spec',
 }
+
+DOCSTRING = 'DOCSTRING'

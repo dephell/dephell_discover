@@ -4,6 +4,7 @@ from typing import List, Optional
 import attr
 
 from ._cached_propery import cached_property
+from ._constants import DOCSTRING
 from ._line import Line
 
 
@@ -22,11 +23,18 @@ class MetaInfo:
     @staticmethod
     def _parse_file(path: Path) -> List[Line]:
         lines = []
+        # parse variables in file line-by-line
         with path.open('r', encoding='utf8') as stream:
             for row, content in enumerate(stream):
                 line = Line.parse(content=content, row=row, path=path)
                 if line is not None:
                     lines.append(line)
+        # parse docstring
+        if path.name == '__init__.py':
+            content = path.read_text(encoding='utf8')
+            line = Line.parse_docstring(content=content, path=path)
+            if line is not None:
+                lines.append(line)
         return lines
 
     @staticmethod
@@ -80,3 +88,17 @@ class MetaInfo:
     @cached_property
     def version(self) -> List[str]:
         return self._get_var(name='__version__', sep='.')
+
+    @cached_property
+    def description(self) -> Optional[str]:
+        """Docstring of `__init__.py`
+        """
+        return self._get_var(name=DOCSTRING)
+
+    @cached_property
+    def summary(self) -> Optional[str]:
+        """first line of description
+        """
+        if self.description is None:
+            return None
+        return self.description.lstrip().split('\n', maxsplit=1)[0].rstrip()
