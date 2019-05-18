@@ -19,7 +19,7 @@ command = "mypy --ignore-missing-imports --allow-redefinition dephell_discover"
 
 [tool.poetry]
 name = "dephell_discover"
-version = "0.1.3"
+version = "0.2.0"
 description = "Find project modules and data files (packages and package_data for setup.py)."
 authors = ["Gram <master_fess@mail.ru>"]
 readme = "README.md"
@@ -41,4 +41,3 @@ classifiers = [
 python = ">=3.5"
 attr = "*"
 
-[tool.poetry.dev-dependencies]
