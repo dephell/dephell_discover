@@ -57,7 +57,7 @@ class MetaInfo:
 
         return cls(lines=lines)
 
-    def _get_var(self, name: str, sep: str = ', ') -> List[str]:
+    def _get_var(self, name: str, sep: str = ', ') -> Optional[str]:
         for line in self.lines:
             if line.target == name:
                 if type(line.value) is list:
@@ -69,9 +69,9 @@ class MetaInfo:
     def authors(self) -> List[str]:
         authors = []
         for name in ('__author__', '__authors__', '__maintainer__', '__credits__'):
-            var = self._get_var(name=name)
-            if var:
-                authors.extend(var.split(', '))
+            some_authors = self._get_var(name=name)
+            if some_authors:
+                authors.extend(some_authors.split(', '))
         if authors:
             for name in ('__email__', '__contact__'):
                 if '<' in authors[0]:
@@ -86,7 +86,7 @@ class MetaInfo:
         return self._get_var(name='__license__')
 
     @cached_property
-    def version(self) -> List[str]:
+    def version(self) -> Optional[str]:
         return self._get_var(name='__version__', sep='.')
 
     @cached_property

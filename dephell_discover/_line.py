@@ -38,17 +38,19 @@ class Line:
             tree = ast.parse(content)
         except SyntaxError:
             return None
+        if type(tree) is not ast.Module:
+            return None
         # check is assigment
-        if type(tree.body[0]) is not ast.Assign:
+        if type(tree.body[0]) is not ast.Assign:  # type: ignore
             return None
         # check is correct target
-        target = tree.body[0].targets[0]
+        target = tree.body[0].targets[0]  # type: ignore
         if type(target) is not ast.Name:
             return None
         if target.id not in cls._vars:
             return None
 
-        value = tree.body[0].value
+        value = tree.body[0].value  # type: ignore
 
         # get string
         if type(value) is ast.Str:
