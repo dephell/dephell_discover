@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Iterable
 
 import attr
 
@@ -37,8 +37,8 @@ class MetaInfo:
                 lines.append(line)
         return lines
 
-    @staticmethod
-    def parse(cls, paths: List[Path], recursive: bool = False) -> 'MetaInfo':
+    @classmethod
+    def parse(cls, paths: Iterable[Path], recursive: bool = False) -> 'MetaInfo':
         lines = []
         for path in paths:
             # parse file

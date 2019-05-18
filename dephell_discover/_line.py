@@ -7,7 +7,7 @@ import attr
 from ._constants import DOCSTRING
 
 
-@attr.s(freeze=True)
+@attr.s(frozen=True)
 class Line:
     target = attr.ib(type=str)
     value = attr.ib()

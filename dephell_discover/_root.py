@@ -6,6 +6,7 @@ import attr
 
 from ._constants import BAD_DIRS_ANY, BAD_DIRS_ROOT, BAD_EXTS
 from ._cached_propery import cached_property
+from ._metainfo import MetaInfo
 from ._package import Package
 from ._data import Data
 
@@ -71,6 +72,11 @@ class Root:
             if data is not None:
                 result.add(data)
         return result
+
+    @cached_property
+    def metainfo(self) -> MetaInfo:
+        path = self.packages[0].path
+        return MetaInfo.parse(paths=(path, ))
 
     # public methods
 
