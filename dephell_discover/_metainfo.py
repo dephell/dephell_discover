@@ -67,18 +67,23 @@ class MetaInfo:
 
     @cached_property
     def authors(self) -> List[str]:
+        # get authors
         authors = []
         for name in ('__author__', '__authors__', '__maintainer__', '__credits__'):
             some_authors = self._get_var(name=name)
             if some_authors:
                 authors.extend(some_authors.split(', '))
-        if authors:
-            for name in ('__email__', '__contact__'):
-                if '<' in authors[0]:
-                    continue
-                mail = self._get_var(name=name)
-                if mail:
-                    authors[0] = '{} <{}>'.format(authors[0], mail)
+        if not authors:
+            return []
+
+        # attach email
+        for name in ('__email__', '__contact__'):
+            if '<' in authors[0]:
+                break
+            mail = self._get_var(name=name)
+            if mail:
+                authors[0] = '{} <{}>'.format(authors[0], mail)
+
         return authors
 
     @cached_property
