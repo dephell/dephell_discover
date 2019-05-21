@@ -80,7 +80,7 @@ class Root:
         # get metainfo only from top-level packages
         paths = [package.path for package in self.packages if '.' not in package.module]
         if not paths:
-            paths = self.packages[0].path
+            paths = [self.packages[0].path]
         return MetaInfo.parse(paths=paths)
 
     # public methods
