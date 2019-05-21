@@ -74,9 +74,14 @@ class Root:
         return result
 
     @cached_property
-    def metainfo(self) -> MetaInfo:
-        path = self.packages[0].path
-        return MetaInfo.parse(paths=(path, ))
+    def metainfo(self) -> Optional[MetaInfo]:
+        if not self.packages:
+            return None
+        # get metainfo only from top-level packages
+        paths = [package.path for package in self.packages if '.' not in package.module]
+        if not paths:
+            paths = self.packages[0].path
+        return MetaInfo.parse(paths=paths)
 
     # public methods
 
