@@ -39,5 +39,5 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.5"
-attr = "*"
+attrs = "*"
 
