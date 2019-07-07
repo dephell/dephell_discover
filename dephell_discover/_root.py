@@ -65,8 +65,8 @@ class Root:
         for path in self.path.glob('**/*'):
             if not self.include(path=path):
                 continue
-            # skip dirs and python files
-            if not path.is_file() or path.suffix == '.py':
+            # skip dirs, python files and files without extension
+            if not path.is_file() or path.suffix in ('.py', ''):
                 continue
             data = self._make_data(path=path.parent, ext=path.suffix)
             if data is not None:
