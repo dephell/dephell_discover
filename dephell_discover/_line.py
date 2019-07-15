@@ -41,7 +41,7 @@ class Line:
         if type(tree) is not ast.Module:
             return None
         # check is assigment
-        if type(tree.body[0]) is not ast.Assign:  # type: ignore
+        if not tree.body or type(tree.body[0]) is not ast.Assign:  # type: ignore
             return None
         # check is correct target
         target = tree.body[0].targets[0]  # type: ignore
