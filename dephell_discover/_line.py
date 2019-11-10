@@ -1,11 +1,16 @@
 import ast
 from pathlib import Path
+import sys
 from typing import Optional
 
 import attr
 
 from ._constants import DOCSTRING
 
+if sys.version_info[:2] >= (3,8):
+    _ast_str = ast.Constant
+else:
+    _ast_str = ast.Str
 
 @attr.s(frozen=True)
 class Line:
@@ -53,7 +58,7 @@ class Line:
         value = tree.body[0].value  # type: ignore
 
         # get string
-        if type(value) is ast.Str:
+        if type(value) is _ast_str:
             return cls(
                 target=target.id,
                 value=value.s,
@@ -65,7 +70,7 @@ class Line:
         # get list
         if type(value) is ast.List or type(value) is ast.Tuple:
             for element in value.elts:
-                if type(element) is not ast.Str:
+                if type(element) is not _ast_str:
                     return None
             return cls(
                 target=target.id,
