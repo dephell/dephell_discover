@@ -1,10 +1,25 @@
 import ast
 from pathlib import Path
+import sys
 from typing import Optional
 
 import attr
 
 from ._constants import DOCSTRING
+
+
+def _get_str(node) -> Optional[str]:
+    # python <3.8
+    if sys.version_info[:2] < (3, 8):
+        if type(node) is ast.Str:
+            return node.s
+        return None
+
+    # python >=3.8
+    if type(node) is ast.Constant:
+        if type(node.value) is str:
+            return node.value
+    return None
 
 
 @attr.s(frozen=True)
@@ -50,26 +65,28 @@ class Line:
         if target.id not in cls._vars:
             return None
 
-        value = tree.body[0].value  # type: ignore
+        expr = tree.body[0].value  # type: ignore
 
         # get string
-        if type(value) is ast.Str:
+        value = _get_str(expr)
+        if value:
             return cls(
                 target=target.id,
-                value=value.s,
+                value=value,
                 content=content,
                 row=row,
                 path=path,
             )
 
         # get list
-        if type(value) is ast.List or type(value) is ast.Tuple:
-            for element in value.elts:
-                if type(element) is not ast.Str:
+        if type(expr) is ast.List or type(expr) is ast.Tuple:
+            elements = [_get_str(element) for element in expr.elts]
+            for element in elements:
+                if element is None:
                     return None
             return cls(
                 target=target.id,
-                value=[element.s for element in value.elts],
+                value=elements,
                 content=content,
                 row=row,
                 path=path,
