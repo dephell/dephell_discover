@@ -9,10 +9,15 @@ from ._constants import DOCSTRING
 
 
 def _get_str(node) -> Optional[str]:
-    if type(node) is ast.Str:
-        return node.s
-    if sys.version_info[:2] >= (3, 8):
-        if type(node) is getattr(ast.Constant):
+    # python <3.8
+    if sys.version_info[:2] < (3, 8):
+        if type(node) is ast.Str:
+            return node.s
+        return None
+
+    # python >=3.8
+    if type(node) is ast.Constant:
+        if type(node.value) is str:
             return node.value
     return None
 
