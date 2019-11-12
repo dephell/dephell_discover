@@ -67,7 +67,7 @@ class Line:
         if value:
             return cls(
                 target=target.id,
-                value=value.s,
+                value=value,
                 content=content,
                 row=row,
                 path=path,
