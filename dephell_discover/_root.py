@@ -40,7 +40,7 @@ class Root:
             return {self.name: ''}
 
         # when packages placed in the dirs by package names
-        return {'': ''}
+        return {'': '.'}
 
     @cached_property
     def packages(self) -> List[Package]:
@@ -116,7 +116,7 @@ class Root:
     def _get_module_name(self, path: Path) -> str:
         parts = list(path.parts[len(self.path.parts):])
         root_name, root_dir = next(iter(self.package_dir.items()))
-        if root_dir == '':
+        if root_dir in ('', '.'):
             parts.insert(0, root_name)
         elif parts and parts[0] == root_dir:
             parts = [root_name] + parts[1:]
