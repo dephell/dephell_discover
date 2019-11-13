@@ -31,7 +31,7 @@ root.data
 # {Data(path=Path('../dephell/dephell/templates'), ext='.j2', package=Package(...)), ...}
 
 root.package_dir
-# {'': ''}
+# {'': '.'}
 ```
 
 Package properties:

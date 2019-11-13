@@ -40,7 +40,7 @@ def test_discover_packages(tmp_path):
 
 
 @pytest.mark.parametrize('files, expected', [
-    [('foobar/__init__.py', 'foobar/foo.py', 'foobar/bar.py'), {'': ''}],
+    [('foobar/__init__.py', 'foobar/foo.py', 'foobar/bar.py'), {'': '.'}],
     [('src/__init__.py', 'src/foo.py', 'src/bar.py'), {'foobar': 'src'}],
     [('src/foo.py', 'src/bar.py'), {'': 'src'}],
     [('__init__.py', 'foo.py', 'bar.py'), {'foobar': ''}],
