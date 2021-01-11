@@ -1,3 +1,9 @@
+# THE PROJECT IS ARCHIVED
+
+Forks: https://github.com/orsinium/forks
+
+---
+
 # Dephell Discover
 
 [![travis](https://travis-ci.org/dephell/dephell_discover.svg?branch=master)](https://travis-ci.org/dephell/dephell_discover)
